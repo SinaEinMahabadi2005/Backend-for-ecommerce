@@ -23,3 +23,6 @@ export const auth = catchAsync(async (req, res, next) => {
     },
   });
 });
+export const loginWithPassword = catchAsync(async (req, res, next) => {
+  
+});
