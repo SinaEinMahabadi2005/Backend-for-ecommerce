@@ -5,5 +5,5 @@ const cartSchema=new mongoose.Schema({
         ref:"User"
     }
 } ,{timestamps:true})
-const Cart=mongoose.model(Cart,cartSchema)
+const Cart=mongoose.model("Cart",cartSchema)
 export default Cart
