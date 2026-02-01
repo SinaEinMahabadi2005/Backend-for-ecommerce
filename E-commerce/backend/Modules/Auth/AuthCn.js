@@ -98,3 +98,21 @@ export const resendCode = catchAsync(async (req, res, next) => {
     message: "otp code sent",
   });
 });
+export const forgetPassword = catchAsync(async (req, res, next) => {
+  const { phoneNumber, code, newPassword } = req.body;
+  const resultVerify = await verifyCode(phoneNumber, code);
+  if (!resultVerify) {
+    return next(new HandleERROR("invalid code", 401));
+  }
+  const user = await User.findOne({ phoneNumber });
+  if (!user) {
+    return next(new HandleERROR("user not found", 404));
+  }
+  const hashPassword = bcryptjs.hashSync(newPassword, 10);
+  user.password = hashPassword;
+  await user.save()
+  return res.status(200).json({
+    success:true ,
+    message:"password changed successfully"
+  })
+});
