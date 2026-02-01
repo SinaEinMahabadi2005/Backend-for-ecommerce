@@ -8,6 +8,7 @@ import { catchError } from "vanta-api";
 import { exportValidationData } from "./Middlewares/ExportValidation.js";
 import userRouter from "./Modules/User/User.js";
 import authRouter from "./Modules/Auth/Auth.js";
+import brandRouter from "./Modules/Brand/Brand.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -20,6 +21,7 @@ app.use('/upload',express.static(`${__dirname}/Public`))
 app.use(exportValidationData);
 app.use("/api/users",userRouter)
 app.use("/api/auth",authRouter)
+app.use("/api/brands",brandRouter)
 
 app.use((req, res, next) => {
   return res.status(404).json({
