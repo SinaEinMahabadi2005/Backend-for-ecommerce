@@ -33,12 +33,24 @@ export const getOne = catchAsync(async (req, res, next) => {
   res.status(200).json(result);
 });
 //create
-export const create=catchAsync(async (req,res,next) => {
-    const brand=await Brand.create(req.body)
-    return res.status(200).json({
-        success:true ,
-        message:"create brand successfully" ,
-        data:brand
-    })
-})
+export const create = catchAsync(async (req, res, next) => {
+  const brand = await Brand.create(req.body);
+  return res.status(200).json({
+    success: true,
+    message: "create brand successfully",
+    data: brand,
+  });
+});
 //update
+export const update = catchAsync(async (req, res, next) => {
+  const brand = await Brand.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  return res.status(200).json({
+    success: true,
+    message: "update brand successfully",
+    data: brand,
+  });
+});
+//
