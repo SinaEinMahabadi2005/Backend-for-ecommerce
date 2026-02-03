@@ -10,6 +10,8 @@ import userRouter from "./Modules/User/User.js";
 import authRouter from "./Modules/Auth/Auth.js";
 import brandRouter from "./Modules/Brand/Brand.js";
 import rateLimit from "express-rate-limit";
+import swaggerUi from "swagger-ui-express" ;
+import { swaggerSpace } from "./Utils/Swagger.js";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -29,6 +31,7 @@ app.use(exportValidationData);
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/brands", brandRouter);
+app.use("/api-docs",swaggerUi.serve,swaggerUi.setup(swaggerSpace))
 
 app.use((req, res, next) => {
   return res.status(404).json({
