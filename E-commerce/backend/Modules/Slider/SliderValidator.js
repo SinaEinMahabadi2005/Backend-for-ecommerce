@@ -1,95 +1,172 @@
-import { body, param } from "express-validator";
-import Slider from "./SliderMd.js";
+import { body, param, query } from "express-validator";
 import mongoose from "mongoose";
 
-/* =======================
-   ID PARAM VALIDATOR
-======================= */
-export const sliderIdValidator = [
-  param("id")
-    .custom((value) => mongoose.Types.ObjectId.isValid(value))
-    .withMessage("Invalid slider id"),
+/* ---------- helpers ---------- */
+const isMongoId = (value) =>
+mongoose.Types.ObjectId.isValid(value);
+
+/* =========================================================
+PARAMS
+========================================================= */
+
+/* ---------- slider id param ---------- */
+export const sliderIdParam = [
+param("id")
+.notEmpty()
+.withMessage("Slider id is required")
+.custom(isMongoId)
+.withMessage("Invalid slider id"),
 ];
 
-/* =======================
-   CREATE SLIDER VALIDATOR
-======================= */
+/* =========================================================
+QUERY
+========================================================= */
+
+/* ---------- get all sliders ---------- */
+export const getAllSliderValidator = [
+query("page")
+.optional()
+.isInt({ min: 1 })
+.withMessage("page must be a positive number"),
+
+query("limit")
+.optional()
+.isInt({ min: 1 })
+.withMessage("limit must be a positive number"),
+
+query("search")
+.optional()
+.isString()
+.withMessage("search must be a string"),
+
+query("sort")
+.optional()
+.isString()
+.withMessage("sort must be a string"),
+
+query("fields")
+.optional()
+.isString()
+.withMessage("fields must be a string"),
+
+query("isPublished")
+.optional()
+.isBoolean()
+.withMessage("isPublished must be boolean")
+.toBoolean(),
+];
+
+/* =========================================================
+CREATE
+========================================================= */
+
+/* ---------- create slider ---------- */
 export const createSliderValidator = [
-  body("title")
-    .trim()
-    .notEmpty()
-    .withMessage("Please provide slider title")
-    .custom(async (value) => {
-      const slider = await Slider.findOne({ title: value });
-      if (slider) {
-        throw new Error("Slider title must be unique");
-      }
-      return true;
-    }),
+body("title")
+.exists()
+.withMessage("Slider title is required")
+.bail()
+.isString()
+.withMessage("Slider title must be a string")
+.bail()
+.trim()
+.notEmpty()
+.withMessage("Slider title cannot be empty")
+.bail()
+.isLength({ min: 2, max: 150 })
+.withMessage("Slider title must be between 2 and 150 characters"),
 
-  body("image")
-    .trim()
-    .notEmpty()
-    .withMessage("Please provide slider image"),
+body("image")
+.exists()
+.withMessage("Slider image is required")
+.bail()
+.isString()
+.withMessage("Slider image must be a string")
+.bail()
+.trim()
+.notEmpty()
+.withMessage("Slider image cannot be empty"),
 
-  body("href")
-    .notEmpty()
-    .withMessage("Please provide slider link")
-    .isURL()
-    .withMessage("Slider link must be a valid URL"),
+body("href")
+.exists()
+.withMessage("Slider href is required")
+.bail()
+.isString()
+.withMessage("Slider href must be a string")
+.bail()
+.trim()
+.isURL()
+.withMessage("Slider href must be a valid URL"),
 
-  body("path")
-    .trim()
-    .notEmpty()
-    .withMessage("Please provide slider path"),
+body("path")
+.exists()
+.withMessage("Slider path is required")
+.bail()
+.isString()
+.withMessage("Slider path must be a string")
+.bail()
+.trim()
+.notEmpty()
+.withMessage("Slider path cannot be empty"),
 
-  body("isPublished")
-    .optional()
-    .isBoolean()
-    .withMessage("isPublished must be boolean"),
+body("isPublished")
+.optional()
+.isBoolean()
+.withMessage("isPublished must be boolean")
+.toBoolean(),
 ];
 
-/* =======================
-   UPDATE SLIDER VALIDATOR
-======================= */
+/* =========================================================
+UPDATE
+========================================================= */
+
+
+/* ---------- update slider ---------- */
 export const updateSliderValidator = [
-  body("title")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Slider title cannot be empty")
-    .custom(async (value, { req }) => {
-      const slider = await Slider.findOne({
-        title: value,
-        _id: { $ne: req.params.id },
-      });
-      if (slider) {
-        throw new Error("Slider title must be unique");
-      }
-      return true;
-    }),
+...sliderIdParam,
 
-  body("image")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Slider image cannot be empty"),
+body("title")
+.optional()
+.isString()
+.withMessage("Slider title must be a string")
+.bail()
+.trim()
+.notEmpty()
+.withMessage("Slider title cannot be empty")
+.bail()
+.isLength({ min: 2, max: 150 })
+.withMessage("Slider title must be between 2 and 150 characters"),
 
-  body("href")
-    .optional()
-    .notEmpty()
-    .withMessage("Slider link cannot be empty")
-    .isURL()
-    .withMessage("Slider link must be a valid URL"),
+body("image")
+.optional()
+.isString()
+.withMessage("Slider image must be a string")
+.bail()
+.trim()
+.notEmpty()
+.withMessage("Slider image cannot be empty"),
 
-  body("path")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Slider path cannot be empty"),
+body("href")
+.optional()
+.isString()
+.withMessage("Slider href must be a string")
+.bail()
+.trim()
+.isURL()
+.withMessage("Slider href must be a valid URL"),
 
-  body("isPublished")
-    .optional()
-    .isBoolean()
-    .withMessage("isPublished must be boolean"),
+body("path")
+.optional()
+.isString()
+.withMessage("Slider path must be a string")
+.bail()
+.trim()
+.notEmpty()
+.withMessage("Slider path cannot be empty"),
+
+body("isPublished")
+.optional()
+.isBoolean()
+.withMessage("isPublished must be boolean")
+.toBoolean(),
 ];
