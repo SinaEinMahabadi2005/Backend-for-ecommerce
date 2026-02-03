@@ -6,11 +6,14 @@ import __dirname from "./../../app.js";
 // get all
 export const getAll = catchAsync(async (req, res, next) => {
   const feature = new ApiFeatures(Brand, req.query, req.role)
-    .addManualFilters(
-      req.role == "admin" || req.role == "superAdmin"
+    .addManualFilters({
+      ...(req.role == "admin" || req.role == "superAdmin"
         ? {}
-        : { isPublished: true },
-    )
+        : { isPublished: true }),
+      ...(req.query.search
+        ? { title: { $regex: req.query.search, $options: "i" } }
+        : {}),
+    })
     .filter()
     .sort()
     .limitFields()
@@ -72,7 +75,7 @@ export const remove = catchAsync(async (req, res, next) => {
     fs.unlinkSync(`${__dirname}/Public/${brand.image}`);
   }
   return res.status(200).json({
-    success:true ,
-    message:"brand deleted successfully"
-  })
+    success: true,
+    message: "brand deleted successfully",
+  });
 });
