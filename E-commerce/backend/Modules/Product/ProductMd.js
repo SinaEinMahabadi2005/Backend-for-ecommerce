@@ -1,6 +1,59 @@
 import mongoose from "mongoose";
+const informationSchema = new mongoose.Schema(
+  {
+    key: {
+      type: String,
+      unique: [true, "title is unique"],
+      required: [true, "title  is required"],
+    },
+    value: {
+      type: String,
+      default: "",
+      required: [true, "value  is required"],
+    },
+  },
+  { _id: false },
+);
+//
 const productSchema = new mongoose.Schema(
   {
+    title: {
+      type: String,
+      unique: [true, "title is unique"],
+      required: [true, "title  is required"],
+    },
+    description: {
+      type: String,
+      default: "",
+      required: [true, "description  is required"],
+    },
+    information: {
+      type: [informationSchema],
+      default: [],
+    },
+    avrageRate: {
+      type: Number,
+      default: 0,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
+    },
+    defaultProductId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductVariant",
+      required: [true, "ProductVariant id is required"],
+    },
+    defaultProductIds: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "ProductVariant",
+          required: [true, "ProductVariant id is required"],
+        },
+      ],
+      default: [],
+    },
     brandId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",
@@ -10,6 +63,14 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: [true, "category id is required"],
+    },
+    images: {
+      type: [String],
+      default: [],
+    },
+    tags: {
+      type: [String],
+      default: [],
     },
     isPublished: {
       type: Boolean,
