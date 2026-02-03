@@ -17,7 +17,7 @@ export const getAll = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate()
-    .populate({path:"supCategoryId"});
+    .populate({ path: "supCategoryId" });
   const result = await feature.execute();
   res.status(200).json(result);
 });
@@ -33,7 +33,7 @@ export const getOne = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate()
-    .populate();
+    .populate({ path: "supCategoryId" });
   const result = await feature.execute();
   res.status(200).json(result);
 });
@@ -61,10 +61,11 @@ export const update = catchAsync(async (req, res, next) => {
 //remove
 export const remove = catchAsync(async (req, res, next) => {
   const product = await Product.find({ categoryId: req.params.id });
-  if (product.length > 0) {
+  const categries=await Category.find({supCategoryId:req.params.id})
+  if (product.length > 0 && categries.length > 0) {
     return next(
       new HandleERROR(
-        "You can not delete this category because there are products related to it",
+        "You can not delete this category because there are products related to it or this category contain many category",
         400,
       ),
     );
