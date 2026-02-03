@@ -1,5 +1,4 @@
 import ApiFeatures, { catchAsync, HandleERROR } from "vanta-api";
-import Brand from "./BrandMd.js";
 import Product from "../Product/ProductMd.js";
 import fs from "fs";
 import __dirname from "./../../app.js";
@@ -11,7 +10,7 @@ export const getAll = catchAsync(async (req, res, next) => {
       ...(req.role === "admin" || req.role === "superAdmin"
         ? {}
         : { isPublished: true }),
-      ...(search ? { phoneNumber: { $regex: search, $options: "i" } } : {}),
+      ...(req.query.search ? { phoneNumber: { $regex: req.query.search, $options: "i" } } : {}),
     })
     .filter()
     .sort()
