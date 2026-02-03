@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { create, getAll, getOne, remove, update } from "./SliderCn.js";
-import isAdmin from "../../Middlewares/isAdmin";
+import isAdmin from "../../Middlewares/isAdmin.js";
 import { createSliderValidator, getAllSliderValidator, sliderIdParam, updateSliderValidator } from "./SliderValidator.js";
 import { handleValidationErrors } from "../../Utils/handleValidationError.js";
 const sliderRouter = Router();
