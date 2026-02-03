@@ -10,9 +10,10 @@ const categorySchema=new mongoose.Schema({
         type:String ,
         default:""
     } ,
-     parentCategoryId:{
+     supCategoryId:{
         type:mongoose.Schema.Types.ObjectId ,
-        ref:"Category"
+        ref:"Category" , 
+        default:null
     } ,
     isPublished:{
         type:Boolean ,

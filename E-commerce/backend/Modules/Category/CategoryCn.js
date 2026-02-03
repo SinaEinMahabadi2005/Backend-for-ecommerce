@@ -17,13 +17,13 @@ export const getAll = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate()
-    .populate();
+    .populate({path:"supCategoryId"});
   const result = await feature.execute();
   res.status(200).json(result);
 });
 // get one
 export const getOne = catchAsync(async (req, res, next) => {
-  const feature = new ApiFeatures(Brand, req.query, req.role)
+  const feature = new ApiFeatures(Category, req.query, req.role)
     .addManualFilters(
       req.role == "admin" || req.role == "superAdmin"
         ? { _id: req.params.id }
@@ -39,42 +39,42 @@ export const getOne = catchAsync(async (req, res, next) => {
 });
 //create
 export const create = catchAsync(async (req, res, next) => {
-  const brand = await Brand.create(req.body);
+  const category = await Category.create(req.body);
   return res.status(200).json({
     success: true,
-    message: "create brand successfully",
-    data: brand,
+    message: "create category successfully",
+    data: category,
   });
 });
 //update
 export const update = catchAsync(async (req, res, next) => {
-  const brand = await Brand.findByIdAndUpdate(req.params.id, req.body, {
+  const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
   return res.status(200).json({
     success: true,
-    message: "update brand successfully",
-    data: brand,
+    message: "update category successfully",
+    data: category,
   });
 });
 //remove
 export const remove = catchAsync(async (req, res, next) => {
-  const product = await Product.find({ brandId: req.params.id });
+  const product = await Product.find({ categoryId: req.params.id });
   if (product.length > 0) {
     return next(
       new HandleERROR(
-        "You can not delete this brand because there are products related to it",
+        "You can not delete this category because there are products related to it",
         400,
       ),
     );
   }
-  const brand = await Brand.findByIdAndDelete(req.params.id);
-  if (fs.existsSync(`${__dirname}/Public/${brand.image}`)) {
-    fs.unlinkSync(`${__dirname}/Public/${brand.image}`);
+  const category = await Category.findByIdAndDelete(req.params.id);
+  if (fs.existsSync(`${__dirname}/Public/${category.image}`)) {
+    fs.unlinkSync(`${__dirname}/Public/${category.image}`);
   }
   return res.status(200).json({
     success: true,
-    message: "brand deleted successfully",
+    message: "category deleted successfully",
   });
 });
