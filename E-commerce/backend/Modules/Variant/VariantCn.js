@@ -9,7 +9,11 @@ import ProductVariant from "../ProductVariant/ProductVariant.js";
 // get all
 export const getAll = catchAsync(async (req, res, next) => {
   const feature = new ApiFeatures(Variant, req.query, req.role)
-    .addManualFilters()
+    .addManualFilters(
+      req.query.search
+        ? { value: { $regex: req.query.search, $options: "i" } }
+        : {},
+    )
     .filter()
     .sort()
     .limitFields()
