@@ -9,6 +9,12 @@ import { exportValidationData } from "./Middlewares/ExportValidation.js";
 import userRouter from "./Modules/User/User.js";
 import authRouter from "./Modules/Auth/Auth.js";
 import brandRouter from "./Modules/Brand/Brand.js";
+import rateLimit from "express-rate-limit";
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -17,11 +23,12 @@ export const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cors());
-app.use('/upload',express.static(`${__dirname}/Public`))
+app.use(limiter)
+app.use("/upload", express.static(`${__dirname}/Public`));
 app.use(exportValidationData);
-app.use("/api/users",userRouter)
-app.use("/api/auth",authRouter)
-app.use("/api/brands",brandRouter)
+app.use("/api/users", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/brands", brandRouter);
 
 app.use((req, res, next) => {
   return res.status(404).json({
