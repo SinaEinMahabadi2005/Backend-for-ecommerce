@@ -34,15 +34,19 @@ const productSchema = new mongoose.Schema(
     avrageRate: {
       type: Number,
       default: 0,
+      min: 0,
+      max: 5,
     },
     ratingCount: {
       type: Number,
+      min: 0,
       default: 0,
     },
     defaultProductId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ProductVariant",
       required: [true, "ProductVariant id is required"],
+      default: null,
     },
     defaultProductIds: {
       type: [
