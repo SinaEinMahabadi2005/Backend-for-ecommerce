@@ -116,3 +116,23 @@ export const remove = catchAsync(async (req, res, next) => {
     message: "product deleted successfully",
   });
 });
+export const favorite = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.userId);
+  let isFavorite;
+  isFavorite = user.favoriteProductIds.find(
+    (item) => item.toString() == req.params.id.toString(),
+  );
+  if (isFavorite) {
+    user.favoriteProductIds = user.favoriteProductIds.filter(
+      (item) => item.toString() == req.params.id.toString(),
+    );
+  } else {
+    user.favoriteProductIds.push(req.params.id);
+  }
+  return res.status(200).json({
+    success: true,
+    message: isFavorite
+      ? "Product Successfully remove from Favorite List"
+      : "Product Successfully add from Favorite List",
+  });
+});
