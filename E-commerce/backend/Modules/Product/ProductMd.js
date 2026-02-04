@@ -42,13 +42,13 @@ const productSchema = new mongoose.Schema(
       min: 0,
       default: 0,
     },
-    defaultProductId: {
+    defaultProductVariantId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ProductVariant",
       required: [true, "ProductVariant id is required"],
       default: null,
     },
-    defaultProductIds: {
+    ProductVariantIds: {
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
@@ -75,6 +75,10 @@ const productSchema = new mongoose.Schema(
     tags: {
       type: [String],
       default: [],
+    },
+    boughtCount: {
+      type: Number,
+      default: 0,
     },
     isPublished: {
       type: Boolean,
