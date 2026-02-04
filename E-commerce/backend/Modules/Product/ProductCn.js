@@ -22,7 +22,7 @@ export const getAll = catchAsync(async (req, res, next) => {
     .limitFields()
     .paginate()
     .populate([
-      { path: "ProductVariantIds" },
+      { path: "defaultProductVariantId", populate: { path: "variantId" } },
       { path: "categoryId" },
       { path: "brandId" },
     ]);
@@ -43,7 +43,7 @@ export const getOne = catchAsync(async (req, res, next) => {
     .limitFields()
     .paginate()
     .populate([
-      { path: "ProductVariantIds" },
+      { path: "ProductVariantIds", populate: { path: "variantId" } },
       { path: "categoryId" },
       { path: "brandId" },
     ]);
