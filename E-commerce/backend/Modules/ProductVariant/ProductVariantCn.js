@@ -1,5 +1,5 @@
 import ApiFeatures, { catchAsync, HandleERROR } from "vanta-api";
-import ProductVariant from "./ProductVariant.js";
+import ProductVariant from "./ProductVariantMd.js";
 import Product from "../Product/ProductMd.js";
 // get all product variant
 export const getAll = catchAsync(async (req, res, next) => {
