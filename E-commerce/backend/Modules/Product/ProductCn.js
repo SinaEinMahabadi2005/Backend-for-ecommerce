@@ -124,7 +124,7 @@ export const favorite = catchAsync(async (req, res, next) => {
   );
   if (isFavorite) {
     user.favoriteProductIds = user.favoriteProductIds.filter(
-      (item) => item.toString() == req.params.id.toString(),
+      (item) => item.toString() != req.params.id.toString(),
     );
   } else {
     user.favoriteProductIds.push(req.params.id);
