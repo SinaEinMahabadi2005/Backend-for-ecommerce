@@ -20,12 +20,18 @@ const productVariantSchema = new mongoose.Schema(
       required: [true, "price is required"],
       min: [0, "minimum price is 0"],
     },
+    discountPercent: {
+      type: Number,
+      default: 0,
+      min: [0, "minimum is 0"],
+      max: [100, "maximum is 100"],
+    },
     priceAfterDiscount: {
       type: Number,
       min: [0, "minimum price is 0"],
       validate: {
         validator: (item) => {
-          return item < this.price;
+          return item <= this.price;
         },
         message: "price must be greater than price after discount",
       },
@@ -34,4 +40,8 @@ const productVariantSchema = new mongoose.Schema(
   { timestamps: true },
 );
 const ProductVariant = mongoose.model("ProductVariant", productVariantSchema);
+productVariantSchema.pre("save", function (next) {
+  this.priceAfterDiscount = this.price * (1 - this.discountPercent / 100);
+  next();
+});
 export default ProductVariant;
