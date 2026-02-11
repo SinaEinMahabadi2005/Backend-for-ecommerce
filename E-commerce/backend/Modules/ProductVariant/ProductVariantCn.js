@@ -20,8 +20,17 @@ export const getOne = catchAsync(async (req, res, next) => {
     .sort()
     .paginate()
     .limitFields()
-    .populate();
+    .populate({ path: "variantId" });
   const result = await feature.execute();
+  const product = await Product.findById(result.data[0].productId);
+  if (!product.isPublished && req.role != "superAdmin" && req.role != "admin") {
+    return next(
+      new HandleERROR(
+        "you can't see this product variant",
+        400,
+      ),
+    );
+  }
   return res.status(200).json(result);
 });
 // create product variant
@@ -57,7 +66,10 @@ export const remove = catchAsync(async (req, res, next) => {
   const productVariant = await ProductVariant.findById(id);
   if (productVariant.boughtCount > 0) {
     return next(
-      new HandleERROR("you can't remove this product variant becuse purchased"),
+      new HandleERROR(
+        "you can't remove this product variant becuse purchased",
+        400,
+      ),
     );
   }
   const product = await Product.findById(productVariant.productId);
@@ -72,7 +84,7 @@ export const remove = catchAsync(async (req, res, next) => {
   );
   await product.save();
   return res.status(200).jaon({
-    success:true ,
-    message:"remove product variant successfully"
-  })
+    success: true,
+    message: "remove product variant successfully",
+  });
 });
