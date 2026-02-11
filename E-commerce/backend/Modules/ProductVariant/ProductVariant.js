@@ -41,7 +41,11 @@ const productVariantSchema = new mongoose.Schema(
 );
 const ProductVariant = mongoose.model("ProductVariant", productVariantSchema);
 productVariantSchema.pre("save", function (next) {
-  this.priceAfterDiscount = this.price * (1 - this.discountPercent / 100);
+  this.priceAfterDiscount = +(this.price * (1 - this.discountPercent / 100)).toFixed(2);
+  next();
+});
+productVariantSchema.pre("findOneAndUpdate", function (next) {
+  this.priceAfterDiscount = +(this.price * (1 - this.discountPercent / 100)).toFixed(2);
   next();
 });
 export default ProductVariant;
