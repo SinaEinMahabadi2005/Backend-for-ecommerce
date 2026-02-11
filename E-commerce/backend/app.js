@@ -15,6 +15,7 @@ import { swaggerSpace } from "./Utils/Swagger.js";
 import sliderRouter from "./Modules/Slider/Slider.js";
 import categoryRouter from "./Modules/Category/Category.js";
 import variantRouter from "./Modules/Variant/Variant.js";
+import productVariantRouter from "./Modules/ProductVariant/ProductVariant.js";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -38,6 +39,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpace));
 app.use("/api/sliders", sliderRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/variants", variantRouter);
+app.use("/api/product-variant", productVariantRouter);
+
 
 app.use((req, res, next) => {
   return res.status(404).json({
