@@ -36,6 +36,10 @@ const productVariantSchema = new mongoose.Schema(
         message: "price must be greater than price after discount",
       },
     },
+    boughtCount:{
+      type:Number ,
+      default:0
+    }
   },
   { timestamps: true },
 );

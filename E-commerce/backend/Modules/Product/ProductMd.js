@@ -48,7 +48,7 @@ const productSchema = new mongoose.Schema(
       required: [true, "ProductVariant id is required"],
       default: null,
     },
-    ProductVariantIds: {
+    productVariantIds: {
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
