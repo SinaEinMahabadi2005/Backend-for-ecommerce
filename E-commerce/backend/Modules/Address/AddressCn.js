@@ -4,6 +4,7 @@ import Product from "../Product/ProductMd.js";
 import fs from "fs";
 import __dirname from "./../../app.js";
 import Address from "./AddressMd.js";
+import User from "../User/UserMd.js";
 // get all address
 export const getAll = catchAsync(async (req, res, next) => {
   const feature = new ApiFeatures(Address, req.query, req.role)
@@ -42,6 +43,7 @@ export const getOne = catchAsync(async (req, res, next) => {
 //create address
 export const create = catchAsync(async (req, res, next) => {
   const address = await Address.create({...req.body,userId:req.userId});
+  await User.findByIdAndUpdate(req.userId ,{$push:{addressIds:address._id}})
   return res.status(200).json({
     success: true,
     message: "create address successfully",
