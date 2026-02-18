@@ -20,7 +20,7 @@ export const getAll = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate()
-    .populate({path:"userId" ,select:"phoneNumber fullName"});
+    .populate({ path: "userId", select: "phoneNumber fullName" });
   const result = await feature.execute();
   res.status(200).json(result);
 });
@@ -36,14 +36,16 @@ export const getOne = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate()
-    .populate({path:"userId" ,select:"phoneNumber fullName"});
+    .populate({ path: "userId", select: "phoneNumber fullName" });
   const result = await feature.execute();
   res.status(200).json(result);
 });
 //create address
 export const create = catchAsync(async (req, res, next) => {
-  const address = await Address.create({...req.body,userId:req.userId});
-  await User.findByIdAndUpdate(req.userId ,{$push:{addressIds:address._id}})
+  const address = await Address.create({ ...req.body, userId: req.userId });
+  await User.findByIdAndUpdate(req.userId, {
+    $push: { addressIds: address._id },
+  });
   return res.status(200).json({
     success: true,
     message: "create address successfully",
@@ -52,34 +54,40 @@ export const create = catchAsync(async (req, res, next) => {
 });
 //update
 export const update = catchAsync(async (req, res, next) => {
-    const {userId=null ,...otherData}=req.body
-  const brand = await Brand.findByIdAndUpdate(req.params.id, req.body, {
+  const { userId = null, ...otherData } = req.body;
+  const address = await Address.findById(req.params.id);
+  if (
+    address.userId != req.params.id &&
+    req.role != "admin" &&
+    req.role != "superAdmin"
+  ) {
+    return next(new HandleERROR("you don't have permission", 400));
+  }
+  const newAddress = await Address.findByIdAndUpdate(req.params.id, otherData, {
+    runValidator: true,
     new: true,
-    runValidators: true,
   });
   return res.status(200).json({
     success: true,
-    message: "update brand successfully",
-    data: brand,
+    message: "update Address successfully",
+    data: newAddress,
   });
 });
 //remove
 export const remove = catchAsync(async (req, res, next) => {
-  const product = await Product.find({ brandId: req.params.id });
-  if (product.length > 0) {
-    return next(
-      new HandleERROR(
-        "You can not delete this brand because there are products related to it",
-        400,
-      ),
-    );
+   const address = await Address.findById(req.params.id);
+  if (
+    address.userId != req.params.id &&
+    req.role != "admin" &&
+    req.role != "superAdmin"
+  ) {
+    return next(new HandleERROR("you don't have permission", 400));
   }
-  const brand = await Brand.findByIdAndDelete(req.params.id);
-  if (fs.existsSync(`${__dirname}/Public/${brand.image}`)) {
-    fs.unlinkSync(`${__dirname}/Public/${brand.image}`);
-  }
+  await Address.findByIdAndDelete(req.params.id)
+  await User.findByIdAndUpdate(address.userId,{$pull:{addressIds:address._id}})
   return res.status(200).json({
     success: true,
-    message: "brand deleted successfully",
+    message: "address deleted successfully",
+    data:address
   });
 });
