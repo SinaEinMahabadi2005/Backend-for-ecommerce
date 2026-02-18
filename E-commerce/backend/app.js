@@ -16,6 +16,8 @@ import sliderRouter from "./Modules/Slider/Slider.js";
 import categoryRouter from "./Modules/Category/Category.js";
 import variantRouter from "./Modules/Variant/Variant.js";
 import productVariantRouter from "./Modules/ProductVariant/ProductVariant.js";
+import isLogin from "./Middlewares/isLogin.js";
+import addressRouter from "./Modules/Address/Address.js";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -40,6 +42,8 @@ app.use("/api/sliders", sliderRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/variants", variantRouter);
 app.use("/api/product-variant", productVariantRouter);
+app.use("/api/addresses", isLogin,addressRouter);
+
 
 
 app.use((req, res, next) => {
