@@ -16,7 +16,7 @@ const commentSchema = new mongoose.Schema(
       required: [true, "content is required"],
       trim: true,
     },
-    reply: {
+    replyTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Comment",
     },

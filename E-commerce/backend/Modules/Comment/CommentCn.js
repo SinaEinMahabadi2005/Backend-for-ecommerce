@@ -68,35 +68,38 @@ export const create = catchAsync(async (req, res, next) => {
     data: comment,
   });
 });
-//update
-export const update = catchAsync(async (req, res, next) => {
-  const brand = await Brand.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+// change publish
+export const changePublish = catchAsync(async (req, res, next) => {
+  const comment = await Comment.findById(req.params.id);
+  comment.isPublished = !comment.isPublished;
+  const newComment = await comment.save();
   return res.status(200).json({
     success: true,
-    message: "update brand successfully",
-    data: brand,
+    message: "comment brand successfully",
+    data: newComment,
   });
 });
 //remove
 export const remove = catchAsync(async (req, res, next) => {
-  const product = await Product.find({ brandId: req.params.id });
-  if (product.length > 0) {
-    return next(
-      new HandleERROR(
-        "You can not delete this brand because there are products related to it",
-        400,
-      ),
-    );
-  }
-  const brand = await Brand.findByIdAndDelete(req.params.id);
-  if (fs.existsSync(`${__dirname}/Public/${brand.image}`)) {
-    fs.unlinkSync(`${__dirname}/Public/${brand.image}`);
-  }
+  const comment = await Comment.findByIdAndDelete(req.params.id);
+  await Comment.deleteMany({ replyTo: req.params.id });
   return res.status(200).json({
     success: true,
-    message: "brand deleted successfully",
+    message: "comment deleted successfully",
+  });
+});
+// reply
+export const reply = catchAsync(async (req, res, next) => {
+  const comment = await Comment.create({
+    ...req.body,
+    userId: req.userId,
+    isReply: true,
+    isPublished: true,
+    isBought:false
+  });
+  return res.status(200).json({
+    success: true,
+    message: "reply comment created successfully",
+    data:comment
   });
 });

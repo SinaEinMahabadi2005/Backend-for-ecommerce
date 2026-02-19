@@ -25,5 +25,8 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "vanta-api": "^1.3.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
   }
 }
