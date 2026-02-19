@@ -4,6 +4,7 @@ import Product from "../Product/ProductMd.js";
 import fs from "fs";
 import __dirname from "./../../app.js";
 import Comment from "./CommentMd.js";
+import User from "../User/UserMd.js";
 // get all
 export const getAll = catchAsync(async (req, res, next) => {
   const feature = new ApiFeatures(Comment, req.query, req.role)
@@ -40,11 +41,31 @@ export const getAllCommentPost = catchAsync(async (req, res, next) => {
 });
 //create
 export const create = catchAsync(async (req, res, next) => {
-  const brand = await Brand.create(req.body);
+  const user = await User.findById(req.userId);
+  let isBought = user.boughtProductIds.find(
+    (item) => item._id.toString() == req.body.productId.toString(),
+  )
+    ? true
+    : false;
+  const comment = await Comment.create({
+    ...req.body,
+    userId: req.userId,
+    isReply: false,
+    isPublished: false,
+    isBought,
+  });
+  if (req.body.rate && isBought) {
+    const product = await Product.findById(comment.productId);
+    product.avrageRate =
+      (product.avrageRate * product.ratingCount + req.body.rate) /
+      (product.ratingCount + 1);
+    product.ratingCount++;
+    await product.save();
+  }
   return res.status(200).json({
     success: true,
-    message: "create brand successfully",
-    data: brand,
+    message: "comment brand successfully",
+    data: comment,
   });
 });
 //update
