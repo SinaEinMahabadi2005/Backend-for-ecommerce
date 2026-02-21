@@ -167,3 +167,48 @@ export const addItem = catchAsync(async (req, res, next) => {
     message: "add to cart successfully",
   });
 });
+
+export const removeItem = catchAsync(async (req, res, next) => {
+  const { productVariantId } = req.body;
+  const pvr = await ProductVariant.findById(productVariantId);
+  const cart = await Cart.findOne({ userId: req.userId });
+  cart.items = cart.items.filter((item) => {
+    if (item.productVariantId == productVariantId) {
+      item.quantity--;
+      if (item.quantity == 0) {
+        return false;
+      }
+    }
+    return item;
+  });
+  cart.totalPrice-=pvr.totalPrice
+  cart.totalPriceAfterDiscount-=pvr.totalPriceAfterDiscount
+  await cart.save()
+  let newCart = await Cart.findById(cart._id).populate({
+    path: "items",
+    populate: [
+      {
+        path: "productId",
+        select: "title images ratingCount avrageRating",
+      },
+      {
+        path: "productVariantId",
+        select: "price priceAfterDiscount discountPercent quantity variantId",
+        populate: { path: "variantId" },
+      },
+      {
+        path: "categoryId",
+        select: "title",
+      },
+      {
+        path: "brandId",
+        select: "title",
+      },
+    ],
+  });
+  return res.status(200).json({
+    success: true,
+    data: newCart,
+    message: "remove from cart successfully",
+  });
+});
