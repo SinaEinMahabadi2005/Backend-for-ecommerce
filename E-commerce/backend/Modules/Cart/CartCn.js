@@ -1,5 +1,7 @@
-import ApiFeatures, { catchAsync } from "vanta-api";
+import ApiFeatures, { catchAsync, HandleERROR } from "vanta-api";
 import Cart from "./CartMd.js";
+import Product from "../Product/ProductMd.js";
+import ProductVariant from "../ProductVariant/ProductVariantMd.js";
 
 export const getOne = catchAsync(async (req, res, next) => {
   const feature = new ApiFeatures(Cart, req.query, req.role)
@@ -93,5 +95,75 @@ export const getOne = catchAsync(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     data: cartResult,
+  });
+});
+
+export const addItem = catchAsync(async (req, res, next) => {
+  const { productId, productVariantId } = req.body;
+  const pr = await Product.findById(productId);
+  const prv = await ProductVariant.findById(productVariantId);
+  if (prv.quantity == 0) {
+    return next(
+      new HandleERROR(
+        "you cant add this item in cart becuse  not enough quantity",
+        400,
+      ),
+    );
+  }
+  const cart = await Cart.findOne({ userId: req.userId });
+  let add = false;
+  cart.items = cart.items.map((item) => {
+    if (item.productVariantId == productVariantId) {
+      item.quantity++;
+      add = true;
+      if (item.quantity > prv.quantity) {
+        return next(
+          new HandleERROR(
+            "you cant add this item in cart becuse  not enough quantity",
+            400,
+          ),
+        );
+      }
+    }
+    return item;
+  });
+  if (!add) {
+    cart.items.push({
+      productId,
+      productVariantId,
+      quantity: 1,
+      brandId: pr.brandId,
+      categoryId: pr.categoryId,
+    });
+  }
+  cart.totalPrice += pvr.price;
+  cart.totalPriceAfterDiscount = pvr.totalPriceAfterDiscount;
+  await cart.save();
+  let newCart = await Cart.findById(cart._id).populate({
+    path: "items",
+    populate: [
+      {
+        path: "productId",
+        select: "title images ratingCount avrageRating",
+      },
+      {
+        path: "productVariantId",
+        select: "price priceAfterDiscount discountPercent quantity variantId",
+        populate: { path: "variantId" },
+      },
+      {
+        path: "categoryId",
+        select: "title",
+      },
+      {
+        path: "brandId",
+        select: "title",
+      },
+    ],
+  });
+  return res.status(200).json({
+    success: true,
+    data: newCart,
+    message: "add to cart successfully",
   });
 });
