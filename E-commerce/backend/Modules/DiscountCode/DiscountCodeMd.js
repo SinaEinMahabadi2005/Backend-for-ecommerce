@@ -24,8 +24,11 @@ const discountCodeSchema = new mongoose.Schema(
     endDate: {
       type: Date,
       validate:{
-        validator:function(item){
-          return item < this.startDate
+        validator:function(end){
+          if(!end || !this.startDate){
+            return true
+          }
+          return end >= this.startDate
         },
         message:"invalid Date time"
       }

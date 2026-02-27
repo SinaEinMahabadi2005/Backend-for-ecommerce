@@ -101,14 +101,14 @@ export const checkCode = catchAsync(async (req, res, next) => {
     return next(new HandleERROR("incorrect code", 400));
   }
   const cart = await Cart.findOne({ userId });
-  const validateCode = validateCode(
+  const validate = validateCode(
     userId,
     cart.totalPriceAfterDiscount,
     discountCode,
   );
-  if (!validateCode.success) {
+  if (!validate.success) {
     return res.status(400).json({
-      ...validateCode,
+      ...validate,
       message: "invalid code",
     });
   }

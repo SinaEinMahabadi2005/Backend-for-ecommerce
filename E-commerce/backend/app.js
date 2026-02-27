@@ -18,6 +18,7 @@ import variantRouter from "./Modules/Variant/Variant.js";
 import productVariantRouter from "./Modules/ProductVariant/ProductVariant.js";
 import isLogin from "./Middlewares/isLogin.js";
 import addressRouter from "./Modules/Address/Address.js";
+import discountCodeRouter from "./Modules/DiscountCode/DiscountCode.js";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -43,6 +44,7 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/variants", variantRouter);
 app.use("/api/product-variant", productVariantRouter);
 app.use("/api/addresses", isLogin,addressRouter);
+app.use("/api/discount-code",discountCodeRouter)
 
 
 
