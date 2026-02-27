@@ -23,6 +23,12 @@ const discountCodeSchema = new mongoose.Schema(
     },
     endDate: {
       type: Date,
+      validate:{
+        validator:function(item){
+          return item < this.startDate
+        },
+        message:"invalid Date time"
+      }
     },
     value: {
       type: String,
@@ -45,6 +51,10 @@ const discountCodeSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isPublished:{
+      type:Boolean ,
+      default:true
+    }
   },
   { timestamps: true },
 );
