@@ -1,5 +1,6 @@
 import ApiFeatures, { catchAsync, HandleERROR } from "vanta-api";
 import DiscountCode from "./DiscountCodeMd.js";
+import Cart from "../Cart/CartMd.js";
 
 // get all
 export const getAll = catchAsync(async (req, res, next) => {
@@ -83,15 +84,42 @@ export const validateCode = (userId, totalPrice, discountCode) => {
   }
   if (userUsed >= discountCode.maxUsedCount) {
     error.push("used before");
-  } 
-if(discountCode.startDate > now || discountCode.endDate < now){
-    error.push("unavailable use this time")
-}
-return {
-    success:error.length==0 ?true :false ,
-    error
-}
+  }
+  if (discountCode.startDate > now || discountCode.endDate < now) {
+    error.push("unavailable use this time");
+  }
+  return {
+    success: error.length == 0 ? true : false,
+    error,
+  };
 };
 export const checkCode = catchAsync(async (req, res, next) => {
-    
+  const { code } = req.body;
+  const { userId } = req;
+  const discountCode = await DiscountCode.findOne({ code });
+  if (!discountCode) {
+    return next(new HandleERROR("incorrect code", 400));
+  }
+  const cart = await Cart.findOne({ userId });
+  const validateCode = validateCode(
+    userId,
+    cart.totalPriceAfterDiscount,
+    discountCode,
+  );
+  if (!validateCode.success) {
+    return res.status(400).json({
+      ...validateCode,
+      message: "invalid code",
+    });
+  }
+  let finalPrice = cart.totalPriceAfterDiscount;
+  if (discountCode.type == "amount") {
+    finalPrice -= discountCode.value;
+  } else {
+    finalPrice = finalPrice * (1 - discountCode.value / 100);
+  }
+  return res.status(200).json({
+    success: true,
+    data: { finalPrice },
+  });
 });
